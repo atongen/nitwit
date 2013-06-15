@@ -11,6 +11,7 @@ class NitwitApp < Sinatra::Base
   set :assets_prefix, '/assets'
   set :digest_assets, false
   set(:assets_path)   { File.join public_folder, assets_prefix }
+  set :static_cache_control, [:public, max_age: 60 * 60 * 24 * 365]
 
   configure do
     # Setup Sprockets
@@ -33,13 +34,13 @@ class NitwitApp < Sinatra::Base
   end
 
   helpers do
+    include Sinatra::JSON
     include Sprockets::Helpers
     include Nitwit::Helpers
   end
 
   before do
     session[:oauth] ||= {}
-    expires 500, :public, :must_revalidate
   end
 
   get '/' do
@@ -48,25 +49,25 @@ class NitwitApp < Sinatra::Base
 
   get '/login' do
     @request_token = consumer.get_request_token(oauth_callback: "#{my_url}/auth")
-    session[:oauth][:request_token] = request_token.token
-    session[:oauth][:request_token_secret] = request_token.secret
-    redirect request_token.authorize_url
+    session[:oauth][:request_token] = @request_token.token
+    session[:oauth][:request_token_secret] = @request_token.secret
+    redirect to(@request_token.authorize_url)
   end
 
   get '/auth' do
     @access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
-    session[:oauth][:access_token] = access_token.token
-    session[:oauth][:access_token_secret] = access_token.secret
-    redirect "/"
+    session[:oauth][:access_token] = @access_token.token
+    session[:oauth][:access_token_secret] = @access_token.secret
+    redirect to('/')
   end
 
-  get '/search' do
-
+  get '/search.json' do
+    json Nitwit::SearchService.search(params)
   end
 
   get '/logout' do
     session[:oauth] = {}
-    redirect "/"
+    redirect to('/')
   end
 
 end
