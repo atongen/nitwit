@@ -1,5 +1,9 @@
 module Nitwit
   module Helpers
+    def h(text)
+      Rack::Utils.escape_html(text)
+    end
+
     def consumer
       @consumer ||= begin
         key, secret = ENV.values_at('TWITTER_CONSUMER_KEY', 'TWITTER_CONSUMER_SECRET')

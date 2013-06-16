@@ -1,0 +1,20 @@
+<% @result.statuses.each do |tweet| %>
+<div class="media">
+  <a class="pull-left" href="http://twitter.com/<%= tweet.user.screen_name %>" target="_blank">
+    <img class="media-object" src="<%= tweet.user.profile_image_url %>">
+  </a>
+  <div class="media-body">
+    <h4 class="media-heading"><a href="http://twitter.com/<%= tweet.user.screen_name %>" target="_blank"><%= tweet.user.name %></a></h4>
+    <%= tweet.full_text %>
+    <p><small><%= tweet.created_at %> <a href="http://twitter.com/<%= tweet.user.screen_name %>/statuses/<%= tweet.id %>" target="_blank">link</a></small></p>
+  </div>
+</div>
+<% end %>
+
+<% if @result.next_page? %>
+<ul class="pager">
+  <li class="next">
+    <a href="#" class="btn btn-moar" data-max-id="<%= @result.next_page[:max_id] %>">Moar!</a>
+  </li>
+</ul>
+<% end %>

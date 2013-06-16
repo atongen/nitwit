@@ -1,5 +1,5 @@
-<p>Logged in? <%= logged_in? ? 'Yes' : 'No' %></p>
-<p>
-  <a href="/login">Login</a>
-  <a href="/logout">Logout</a>
-</p>
+<form class="form-search" method="post" action="/search">
+  <input type="text" class="input-medium search-query">
+  <button type="submit" class="btn">Search</button>
+</form>
+<div id="result"></div>

@@ -4,13 +4,46 @@
     <meta charset="utf-8">
     <title>Nitwit</title>
     <meta name="description" content="A Simple Twitter Search Interface">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Andrew Tongen">
     <%= stylesheet_tag 'application' %>
     <%= javascript_tag 'application' %>
   </head>
-  <body>
+  <body data-logged-in="<%= logged_in? ? '1' : '0' %>">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nitwit</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav pull-right">
+              <li>
+                <p class="navbar-text">
+                <% if logged_in? %>
+                  Welcome <strong><%=h client.user.name %></strong> | <a href="/logout">Logout</a>
+                <% else %>
+                  <a href="/login">Login</a>
+                <% end %>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container">
-      <%= yield %>
+      <div class="hero-unit">
+        <h1>Nitwit</h1>
+        <p>You can search twitter too!</p>
+      </div>
+      <div class="row">
+        <div class="span12">
+          <%= yield %>
+        </div>
+      </div>
+      <hr />
+      <footer>
+        <p>&copy; Copyright <%= Date.today.year %> <a href="http://andrewtongen.net" target="_blank">Andrew Tongen</a></p>
+      </footer>
     </div>
   </body>
 </html>

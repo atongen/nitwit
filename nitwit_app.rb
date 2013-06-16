@@ -12,6 +12,7 @@ class NitwitApp < Sinatra::Base
 
   configure do
     %w{javascripts stylesheets images}.each do |type|
+      sprockets.append_path "vendor/assets/#{type}"
       sprockets.append_path "assets/#{type}"
       sprockets.append_path Compass::Frameworks['bootstrap'].templates_directory + "/../vendor/assets/#{type}"
     end
@@ -26,6 +27,7 @@ class NitwitApp < Sinatra::Base
 
   helpers do
     include Nitwit::Helpers
+    include Sinatra::Cookies
   end
 
   before do
@@ -47,10 +49,21 @@ class NitwitApp < Sinatra::Base
     @access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
     session[:oauth][:access_token] = @access_token.token
     session[:oauth][:access_token_secret] = @access_token.secret
-    redirect to('/')
+    if cookies[:twitter_oauth_popup]
+      cookies[:twitter_oauth_popup] = nil
+      erb :twitter_popup_close
+    else
+      redirect to('/')
+    end
   end
 
-  get '/search' do
+  post '/search' do
+    if logged_in?
+      @result = Nitwit::SearchService.search(client, params)
+      erb :search
+    else
+      # TODO: handle this
+    end
   end
 
   get '/logout' do
