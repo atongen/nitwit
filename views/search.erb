@@ -1,3 +1,7 @@
+<% if @result.statuses.blank? %>
+<div class="alert alert-error">No results found!</div>
+<% end %>
+
 <% @result.statuses.each do |tweet| %>
 <div class="media">
   <a class="pull-left" href="http://twitter.com/<%= tweet.user.screen_name %>" target="_blank">
