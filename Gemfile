@@ -2,23 +2,19 @@ source 'https://rubygems.org'
 ruby '2.0.0'
 
 gem 'sinatra', require: 'sinatra/base'
-gem 'sinatra-contrib', require: 'sinatra/json'
+gem 'sinatra-asset-pipeline', require: 'sinatra/asset_pipeline'
 gem 'sinatra-support'
 gem 'sprockets-helpers'
-gem 'haml'
 gem 'unicorn'
 gem 'twitter'
 gem 'oauth'
-gem 'json'
-
-gem 'sprockets'
-gem 'sprockets-sass'
-
 gem 'compass'
 gem 'bootstrap-sass'
-gem 'coffee-script'
 
-gem 'uglifier'
+group :assets do
+  gem 'coffee-script'
+  gem 'uglifier'
+end
 
 group :development, :test do
   gem 'heroku'

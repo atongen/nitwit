@@ -5,37 +5,26 @@ require 'bundler'
 Bundler.require
 
 class NitwitApp < Sinatra::Base
-  set :root,          File.dirname(__FILE__)
-  set :assets,        Sprockets::Environment.new(root)
-  set :precompile,    [ /\w+\.(?!js|css).+/, /application.(css|js)$/ ]
-  set :assets_prefix, '/assets'
-  set :digest_assets, false
-  set(:assets_path)   { File.join public_folder, assets_prefix }
-  set :static_cache_control, [:public, max_age: 60 * 60 * 24 * 365]
+  set :assets_precompile, %w{ application.js application.css *.png *.jpg *.jpeg *.gif }
+  set :assets_css_compressor, :sass
+  set :assets_js_compressor, :uglifier
+  register Sinatra::AssetPipeline
 
   configure do
-    # Setup Sprockets
     %w{javascripts stylesheets images}.each do |type|
-      assets.append_path "assets/#{type}"
-      assets.append_path Compass::Frameworks['bootstrap'].templates_directory + "/../vendor/assets/#{type}"
+      sprockets.append_path "assets/#{type}"
+      sprockets.append_path Compass::Frameworks['bootstrap'].templates_directory + "/../vendor/assets/#{type}"
     end
-    assets.append_path 'assets/font'
+    sprockets.append_path 'assets/font'
+  end
 
-    # Configure Sprockets::Helpers (if necessary)
-    Sprockets::Helpers.configure do |config|
-      config.environment = assets
-      config.prefix      = assets_prefix
-      config.digest      = digest_assets
-      config.public_path = public_folder
-    end
-    Sprockets::Sass.add_sass_functions = false
-
-    set :haml, { :format => :html5 }
+  Sprockets::Helpers.configure do |config|
+    config.environment = sprockets
+    config.prefix      = assets_prefix
+    config.public_path = public_folder
   end
 
   helpers do
-    include Sinatra::JSON
-    include Sprockets::Helpers
     include Nitwit::Helpers
   end
 
@@ -44,7 +33,7 @@ class NitwitApp < Sinatra::Base
   end
 
   get '/' do
-    haml :index, layout: :'layouts/application'
+    erb :index, layout: :'layouts/application'
   end
 
   get '/login' do
@@ -61,8 +50,7 @@ class NitwitApp < Sinatra::Base
     redirect to('/')
   end
 
-  get '/search.json' do
-    json Nitwit::SearchService.search(params)
+  get '/search' do
   end
 
   get '/logout' do
